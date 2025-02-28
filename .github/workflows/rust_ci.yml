@@ -1,0 +1,59 @@
+name: Rust CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "engine-src/src/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "engine-src/src/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Update Rust
+        run: rustup update
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git make pkg-config cmake ninja-build \
+          gnome-desktop-testing libasound2-dev libpulse-dev libaudio-dev libjack-dev libsndio-dev \
+          libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev \
+          libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev \
+          libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev libpipewire-0.3-dev libwayland-dev \
+          libdecor-0-dev liburing-dev libsdl2-dev mesa-utils libwebkit2gtk-4.1-dev libappindicator3-dev \
+          librsvg2-dev patchelf
+
+      - name: install frontend dependencies
+        run: npm install # change this to npm, pnpm or bun depending on which one you use.
+
+      - name: Build project
+        run: cargo build --verbose
+        working-directory: engine-src
+
+      - name: Run tests
+        run: cargo test
+        working-directory: engine-src
+
+      - name: Run linter
+        run: cargo clippy -- -D warnings
+        working-directory: engine-src
+
+      # - name: Generate documentation
+      #   run: cargo doc --no-deps --document-private-items
+      #   working-directory: src-tauri

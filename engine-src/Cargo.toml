@@ -1,0 +1,39 @@
+[package]
+name = "Terra_Graphics_Engine"
+version = "0.1.2"
+edition = "2024"
+
+[lib]
+name = "terra_graphics_engine"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.23.4", features = ["extension-module"] }
+rand = "0.9"
+rand_chacha = "0.9"
+rayon = "1.10"
+num_cpus = "1.16"
+sdl3 = { version = "0.14.11", features = ["image", "build-from-source-static"] }
+sdl3-sys = { version = "0.4.4", features = ["build-from-source-static"] }
+sdl3-image-sys = { version = "0.1.0", features = ["build-from-source-static"] }
+glow = "0.16.0"
+# docs for kira: https://docs.rs/kira/latest/kira/
+# On linix this crate needs developement libraries for alsa-sys
+# i.e. `sudo apt-get update && sudo apt-get install libasound2-dev`
+kira = "0.10.4"
+bytemuck = { version = "1.21", features = ["derive"] }
+image = "0.24"
+
+# NOTE: Might be needed in future?
+# once_cell = "1.20.3"
+# image = "0.25.5"
+
+[profile.dev]
+incremental = true # Compile your binary in smaller steps.
+
+[profile.release]
+# codegen-units = 1 # Allows LLVM to perform better optimization.(uses single thread for compilation)
+lto = true        # Enables link-time-optimizations.
+opt-level = 3     # Prioritizes speed. Use `z` if you prefer small binary size.
+panic = "abort"   # Higher performance by disabling panic handlers.
+strip = true      # Ensures debug symbols are removed.
